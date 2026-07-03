@@ -405,6 +405,33 @@
       .admin-nav button { text-align: center; padding: 0.8rem 0; }
       .admin-nav button i { width: auto; }
     }
+    /* ===== Limited-time offer banner ===== */
+    .offer-bar { background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(10,10,10,0.6)); border: 1px solid var(--gold-muted); border-radius: 10px; padding: 1.1rem 1.4rem; margin-bottom: 1.8rem; text-align: center; }
+    .offer-bar .offer-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: var(--black); background: var(--gold-primary); padding: 3px 12px; border-radius: 20px; font-weight: 700; margin-bottom: 0.6rem; }
+    .offer-bar h3 { color: var(--gold-primary); font-size: 1.25rem; margin-bottom: 0.2rem; }
+    .offer-bar p { color: #cfc6b0; font-size: 0.9rem; margin-bottom: 0.6rem; }
+    .offer-bar .cd { display: flex; gap: 0.6rem; justify-content: center; margin-top: 0.4rem; }
+    .offer-bar .cd-box { background: rgba(0,0,0,0.5); border: 1px solid #2a2410; border-radius: 6px; min-width: 52px; padding: 0.4rem 0.2rem; }
+    .offer-bar .cd-box b { display: block; font-family: var(--font-heading); font-size: 1.4rem; color: var(--gold-primary); line-height: 1.1; }
+    .offer-bar .cd-box span { font-size: 0.6rem; letter-spacing: 1px; text-transform: uppercase; color: #998; }
+
+    /* ===== Reviews ===== */
+    .reviews-summary { text-align: center; margin-bottom: 2.2rem; }
+    .rev-avg { display: inline-flex; align-items: center; gap: 0.7rem; color: var(--gold-primary); font-size: 1.1rem; }
+    .rev-avg span { color: #cfc6b0; font-size: 0.92rem; }
+    .reviews-empty { grid-column: 1 / -1; text-align: center; color: #888; padding: 2rem; }
+    .reviews-empty i { font-size: 2.4rem; color: #2a2a2a; display: block; margin-bottom: 0.8rem; }
+    .star-input { display: flex; gap: 0.4rem; font-size: 1.6rem; color: var(--gold-primary); cursor: pointer; }
+    .star-input i { transition: transform 0.1s; }
+    .star-input i:hover { transform: scale(1.15); }
+
+    /* ===== Category manager (admin) ===== */
+    .cat-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.8rem; }
+    .cat-chip { display: inline-flex; align-items: center; gap: 8px; background: #111; border: 1px solid #2a2a2a; border-radius: 20px; padding: 5px 12px; font-size: 0.85rem; color: #ddd; }
+    .cat-chip i { color: var(--red); cursor: pointer; font-size: 0.8rem; }
+    .cat-chip i:hover { color: #fff; }
+    .cat-add { display: flex; gap: 0.6rem; }
+    .cat-add input { flex: 1; }
   </style>
 </head>
 <body>
@@ -483,6 +510,7 @@
         <canvas id="hero-canvas"></canvas>
         <div class="hero-content">
           <div class="hero-text fade-up">
+            <div id="offer-bar" class="offer-bar hidden"></div>
             <h1 class="hero-title" id="public-hero-title">Scent of the Ancients</h1>
             <p class="hero-subtitle">Discover the timeless elegance of Egyptian-inspired luxury fragrances, handcrafted to awaken your inner royalty.</p>
             <button class="btn-gold" onclick="document.getElementById('collection').scrollIntoView({behavior: 'smooth'})">Explore Collection</button>
@@ -511,12 +539,7 @@
       <section id="collection" class="collection">
         <h2 class="section-title fade-up">The Collection</h2>
         <div class="filter-bar fade-up">
-          <div class="filter-group">
-            <button class="filter-btn active" onclick="setFilter('type', 'All', this)">All Categories</button>
-            <button class="filter-btn" onclick="setFilter('type', 'Perfume', this)">Perfumes</button>
-            <button class="filter-btn" onclick="setFilter('type', 'Body Splash', this)">Body Splashes</button>
-            <button class="filter-btn" onclick="setFilter('type', 'Gift Set', this)">Gift Sets</button>
-          </div>
+          <div class="filter-group" id="type-filter-group"></div>
           <div class="filter-group">
             <button class="filter-btn active" onclick="setFilter('gender', 'All', this)">All Genders</button>
             <button class="filter-btn" onclick="setFilter('gender', 'Male', this)">Male</button>
@@ -575,23 +598,11 @@
       </section>
 
       <section id="testimonials" class="testimonials">
-        <h2 class="section-title fade-up">Echoes of Royalty</h2>
-        <div class="testi-grid">
-          <div class="testi-card fade-up">
-            <div class="testi-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-            <p class="testi-text">"Pharaoh's Gold is nothing short of majestic. I've never received so many compliments. The bottle itself is a piece of art."</p>
-            <h4 class="testi-name">Sarah M.</h4>
-          </div>
-          <div class="testi-card fade-up" style="transition-delay: 0.2s;">
-            <div class="testi-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-            <p class="testi-text">"The Nile Lotus body splash is my everyday go-to. It's fresh, delicate, but lasts surprisingly long for a splash."</p>
-            <h4 class="testi-name">Amina K.</h4>
-          </div>
-          <div class="testi-card fade-up" style="transition-delay: 0.4s;">
-            <div class="testi-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
-            <p class="testi-text">"Opening an Altinos package feels like uncovering an ancient treasure. The scent profile is incredibly complex and rich."</p>
-            <h4 class="testi-name">Omar T.</h4>
-          </div>
+        <h2 class="section-title fade-up">What Our Customers Say</h2>
+        <div class="reviews-summary fade-up" id="reviews-summary"></div>
+        <div class="testi-grid" id="reviews-grid"></div>
+        <div style="text-align:center; margin-top:2.5rem;" class="fade-up">
+          <button class="btn-gold" onclick="openReviewModal()"><i class="fas fa-pen" style="margin-right:8px;"></i> Write a Review</button>
         </div>
       </section>
     </div>
@@ -729,6 +740,7 @@
           <button class="active" onclick="switchAdminTab('dashboard', this)"><i class="fas fa-chart-line"></i> <span class="label-text">Dashboard</span></button>
           <button onclick="switchAdminTab('products', this)"><i class="fas fa-box"></i> <span class="label-text">Products</span></button>
           <button onclick="switchAdminTab('orders', this)"><i class="fas fa-shopping-cart"></i> <span class="label-text">Orders</span></button>
+          <button onclick="switchAdminTab('reviews', this)"><i class="fas fa-star"></i> <span class="label-text">Reviews</span></button>
           <button onclick="switchAdminTab('settings', this)"><i class="fas fa-cog"></i> <span class="label-text">Settings</span></button>
         </div>
         <div style="margin-top: auto;">
@@ -782,6 +794,28 @@
           </div>
         </div>
 
+        <!-- Reviews Tab -->
+        <div id="tab-reviews" class="admin-tab hidden">
+          <div class="admin-header">
+            <h2>Reviews</h2>
+            <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+              <button class="btn-outline" style="padding:8px 14px; border-radius:4px; cursor:pointer;" onclick="exportReviews()"><i class="fas fa-file-export"></i> Export for site</button>
+              <button class="btn-gold" onclick="openReviewModal(true)"><i class="fas fa-plus"></i> Add Review</button>
+            </div>
+          </div>
+          <div class="help-note">
+            <strong>Add a WhatsApp review:</strong> tap “Add Review” to publish a comment a customer sent you — it goes live immediately. <strong>Visitor reviews</strong> submitted on the site show up here as “Pending”; approve them to display them. Because this is a static site, reviews are stored in the browser they were added on. To show one fixed set to <em>every</em> visitor on every device, use “Export for site” and paste the result into the <code>DEFAULT_REVIEWS</code> line in the file, then re-publish.
+          </div>
+          <div class="table-wrapper">
+            <table class="admin-table">
+              <thead>
+                <tr><th>Name</th><th>Rating</th><th>Comment</th><th>Source</th><th>Status</th><th>Date</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="admin-reviews-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
         <!-- Settings Tab -->
         <div id="tab-settings" class="admin-tab hidden">
           <div class="admin-header">
@@ -800,6 +834,33 @@
             <div class="form-group"><label>TikTok Link</label><input type="text" id="set-tiktok"></div>
             <div class="form-group"><label>Facebook Link</label><input type="text" id="set-fb"></div>
             <div class="form-group"><label>WhatsApp Number (with country code)</label><input type="text" id="set-wa" placeholder="+201557856072"></div>
+
+            <hr style="border-color:#222; margin:1.5rem 0;">
+            <h3 style="font-size:1.1rem; margin-bottom:0.3rem;">Product Categories</h3>
+            <p style="color:#888; font-size:0.82rem; margin-bottom:0.9rem;">These appear as filter buttons on the shop and as choices when adding a product. Changes save instantly.</p>
+            <div class="form-group">
+              <div id="cat-list" class="cat-list"></div>
+              <div class="cat-add">
+                <input type="text" id="new-cat" placeholder="e.g. Attar / Oil Perfume" onkeydown="if(event.key==='Enter'){event.preventDefault();addCategory();}">
+                <button type="button" class="btn-gold btn-outline" style="padding:0 18px; border-radius:4px; cursor:pointer; white-space:nowrap;" onclick="addCategory()">Add</button>
+              </div>
+            </div>
+
+            <hr style="border-color:#222; margin:1.5rem 0;">
+            <h3 style="font-size:1.1rem; margin-bottom:0.3rem;">Limited-Time Offer</h3>
+            <p style="color:#888; font-size:0.82rem; margin-bottom:0.9rem;">Shows a countdown banner on the homepage. An optional discount applies to every product price while the offer is live.</p>
+            <div class="form-group">
+              <label style="display:flex; align-items:center; gap:0.6rem; cursor:pointer;">
+                <input type="checkbox" id="set-offer-enabled" style="width:auto;"> Enable offer banner &amp; countdown
+              </label>
+            </div>
+            <div class="form-group"><label>Offer Title</label><input type="text" id="set-offer-title" placeholder="Eid Sale"></div>
+            <div class="form-group"><label>Offer Subtitle (optional)</label><input type="text" id="set-offer-subtitle" placeholder="Free delivery on every order this week"></div>
+            <div class="form-row">
+              <div class="form-group"><label>Ends At</label><input type="datetime-local" id="set-offer-end"></div>
+              <div class="form-group"><label>Site-wide Discount (%, 0 = none)</label><input type="number" id="set-offer-discount" min="0" max="90" placeholder="0"></div>
+            </div>
+
             <hr style="border-color:#222; margin:1.5rem 0;">
             <div class="form-group"><label>Admin Password</label><input type="text" id="set-pwd"></div>
             <div class="help-note" style="margin-top:0;">⚠️ This password lives in the browser and is <strong>not real security</strong> — never store sensitive data in this panel. It only keeps casual visitors out of the dashboard.</div>
@@ -821,7 +882,7 @@
         <div class="form-row">
           <div class="form-group"><label>Product Name</label><input type="text" id="prod-name" required></div>
           <div class="form-group"><label>Type</label>
-            <select id="prod-type"><option>Perfume</option><option>Body Splash</option><option>Gift Set</option></select>
+            <select id="prod-type"></select>
           </div>
         </div>
         <div class="form-row">
@@ -863,6 +924,29 @@
     </div>
   </div>
 
+  <!-- Review Modal (public + admin) -->
+  <div id="review-modal" class="modal-overlay">
+    <div class="modal-content" style="max-width:480px;">
+      <div class="modal-header">
+        <h3 id="review-modal-title">Write a Review</h3>
+        <button class="modal-close" onclick="closeReviewModal()">&times;</button>
+      </div>
+      <div class="admin-form">
+        <div class="form-group"><label>Your Name</label><input type="text" id="rev-name" maxlength="40" placeholder="e.g. Mariam H."></div>
+        <div class="form-group">
+          <label>Rating</label>
+          <div class="star-input" id="rev-stars">
+            <i class="far fa-star" data-v="1"></i><i class="far fa-star" data-v="2"></i><i class="far fa-star" data-v="3"></i><i class="far fa-star" data-v="4"></i><i class="far fa-star" data-v="5"></i>
+          </div>
+        </div>
+        <div class="form-group"><label>Your Review</label><textarea id="rev-text" maxlength="400" rows="4" placeholder="Share your experience with Altinos..."></textarea></div>
+        <div id="rev-error" class="error-msg">Please add your name, a star rating, and a comment.</div>
+        <button type="button" class="btn-gold" style="width:100%; margin-top:0.5rem;" onclick="submitReview()">Submit Review</button>
+        <p id="rev-note" style="color:#888; font-size:0.78rem; margin-top:0.8rem; text-align:center;"></p>
+      </div>
+    </div>
+  </div>
+
   <!-- Toasts -->
   <div id="toast-wrap"></div>
 
@@ -879,6 +963,42 @@
     function fmtEGP(n) { return Number(n || 0).toLocaleString('en-US') + ' EGP'; }
     function bottleSvg(cls) { return `<svg class="${cls || ''}" viewBox="0 0 200 400"><use href="#bottle-art"/></svg>`; }
     function productArt(p, cls) { return p.image ? `<img src="${escapeHtml(p.image)}" class="${cls || ''}" alt="${escapeHtml(p.name)}">` : bottleSvg(cls); }
+    function starsHtml(n) {
+      n = Math.max(0, Math.min(5, parseInt(n) || 0));
+      return Array(n).fill('<i class="fas fa-star"></i>').join('') + Array(5 - n).fill('<i class="far fa-star"></i>').join('');
+    }
+
+    /* ===== Offer + pricing helpers ===== */
+    function offerActive() {
+      const o = DataStore.getSettings().offer;
+      if (!o || !o.enabled) return null;
+      if (o.endsAt) { const t = new Date(o.endsAt).getTime(); if (isNaN(t) || t <= Date.now()) return null; }
+      return o;
+    }
+    function offerDiscount() {
+      const o = offerActive();
+      const d = o ? Number(o.discountPercent) || 0 : 0;
+      return (d > 0 && d <= 90) ? d : 0;
+    }
+    function effectivePrice(p) {
+      const d = offerDiscount();
+      const base = Number(p.price) || 0;
+      return d > 0 ? Math.round(base * (100 - d) / 100) : base;
+    }
+    function isDiscounted(p) { return offerDiscount() > 0 && effectivePrice(p) < (Number(p.price) || 0); }
+    // Price markup: during an active discount, strike the list price; otherwise honor any oldPrice.
+    function priceHtml(p) {
+      const eff = effectivePrice(p);
+      if (isDiscounted(p)) return `<span class="old-price">${fmtEGP(p.price)}</span>${fmtEGP(eff)}`;
+      return `${p.oldPrice ? `<span class="old-price">${fmtEGP(p.oldPrice)}</span>` : ''}${fmtEGP(eff)}`;
+    }
+
+    /* ===== Review helpers ===== */
+    function publicReviews() {
+      const baked = Array.isArray(DEFAULT_REVIEWS) ? DEFAULT_REVIEWS : [];
+      const local = DataStore.getReviews().filter(r => r.approved);
+      return [...baked, ...local];
+    }
     function toast(msg, type) {
       const wrap = document.getElementById('toast-wrap');
       const el = document.createElement('div');
@@ -903,7 +1023,7 @@
     }
 
     /* ============================== Data Store ============================== */
-    const DATA_VERSION = '2.0';
+    const DATA_VERSION = '3.0';
     const defaultProducts = [
       { id: '1', name: 'Master piece', type: 'Perfume', gender: 'Male', family: 'Fresh & Citrus', price: 950, oldPrice: 1050,
         description: 'Inspired by Imagination from LV 💫.\n\nTop notes: Citron, Calabrian bergamot, Sicilian Orange.\nMiddle notes: Tunisian Neroli, Nigerian Ginger, Ceylon Cinnamon.\nBase notes: Chinese Black Tea, Ambroxan, Guaiac Wood, Olibanum.',
@@ -921,8 +1041,13 @@
       tiktok: 'https://www.tiktok.com/@altinosfragrances?lang=en',
       facebook: 'https://www.facebook.com/profile.php?id=61577954504287',
       whatsapp: '+201557856072', deliveryFee: 60, freeShipOver: 3000, lowStockThreshold: 5,
-      adminPassword: 'altinos2025'
+      adminPassword: 'altinos2025',
+      categories: ['Perfume', 'Body Splash', 'Gift Set'],
+      offer: { enabled: false, title: '', subtitle: '', endsAt: '', discountPercent: 0 }
     };
+    // Reviews baked into the file are shown to EVERY visitor on every device.
+    // Use the admin "Export for site" button to regenerate this array, then paste it here.
+    const DEFAULT_REVIEWS = [];
 
     const DataStore = {
       _migrate() {
@@ -947,19 +1072,30 @@
         let set;
         try { set = JSON.parse(localStorage.getItem('altinos_settings')); } catch (e) { set = null; }
         set = Object.assign({}, defaultSettings, set || {});
+        // Ensure every existing product type is selectable as a category/filter
+        let cats = (Array.isArray(set.categories) && set.categories.length) ? set.categories.slice() : defaultSettings.categories.slice();
+        [...new Set(prods.map(p => p.type).filter(Boolean))].forEach(t => { if (!cats.includes(t)) cats.push(t); });
+        set.categories = cats;
+        if (!set.offer || typeof set.offer !== 'object') set.offer = Object.assign({}, defaultSettings.offer);
         localStorage.setItem('altinos_settings', JSON.stringify(set));
         if (!localStorage.getItem('altinos_orders')) localStorage.setItem('altinos_orders', '[]');
+        if (!localStorage.getItem('altinos_reviews')) localStorage.setItem('altinos_reviews', '[]');
         localStorage.setItem('altinos_version', DATA_VERSION);
       },
       getProducts() { try { return JSON.parse(localStorage.getItem('altinos_products')) || []; } catch (e) { return []; } },
       saveProducts(p) { localStorage.setItem('altinos_products', JSON.stringify(p)); },
       getSettings() {
         let s; try { s = JSON.parse(localStorage.getItem('altinos_settings')); } catch (e) { s = null; }
-        return Object.assign({}, defaultSettings, s || {});
+        const merged = Object.assign({}, defaultSettings, s || {});
+        if (!Array.isArray(merged.categories)) merged.categories = defaultSettings.categories.slice();
+        if (!merged.offer || typeof merged.offer !== 'object') merged.offer = Object.assign({}, defaultSettings.offer);
+        return merged;
       },
       saveSettings(s) { localStorage.setItem('altinos_settings', JSON.stringify(s)); },
       getOrders() { try { return JSON.parse(localStorage.getItem('altinos_orders')) || []; } catch (e) { return []; } },
       saveOrders(o) { localStorage.setItem('altinos_orders', JSON.stringify(o)); },
+      getReviews() { try { return JSON.parse(localStorage.getItem('altinos_reviews')) || []; } catch (e) { return []; } },
+      saveReviews(r) { localStorage.setItem('altinos_reviews', JSON.stringify(r)); },
       getCart() { try { return JSON.parse(localStorage.getItem('altinos_cart')) || []; } catch (e) { return []; } },
       saveCart(c) { localStorage.setItem('altinos_cart', JSON.stringify(c)); }
     };
@@ -1051,8 +1187,65 @@
       document.getElementById('soc-tt').href = s.tiktok || '#';
       document.getElementById('soc-fb').href = s.facebook || '#';
       document.getElementById('soc-wa').href = s.whatsapp ? `https://wa.me/${s.whatsapp.replace(/[^0-9]/g, '')}` : '#';
+      renderTypeFilters();
+      startOfferTimer();
       renderPublicProducts();
+      renderReviewsPublic();
       updateCartUI();
+    }
+
+    /* ===== Limited-time offer banner ===== */
+    let offerTimer = null;
+    function cdBox(n, label) { return `<div class="cd-box"><b>${String(n).padStart(2, '0')}</b><span>${label}</span></div>`; }
+    function renderOfferBar() {
+      const bar = document.getElementById('offer-bar');
+      if (!bar) return;
+      const o = offerActive();
+      if (!o) {
+        const wasShown = bar.dataset.shown === '1';
+        bar.dataset.shown = '0';
+        bar.classList.add('hidden');
+        if (wasShown) renderPublicProducts(); // refresh prices when an offer expires live
+        return;
+      }
+      let cd = '';
+      if (o.endsAt) {
+        const diff = new Date(o.endsAt).getTime() - Date.now();
+        if (diff > 0) {
+          const d = Math.floor(diff / 86400000), h = Math.floor(diff / 3600000) % 24,
+                m = Math.floor(diff / 60000) % 60, sec = Math.floor(diff / 1000) % 60;
+          cd = `<div class="cd">${cdBox(d, 'Days')}${cdBox(h, 'Hrs')}${cdBox(m, 'Min')}${cdBox(sec, 'Sec')}</div>`;
+        }
+      }
+      const disc = Number(o.discountPercent) || 0;
+      bar.innerHTML = `<div class="offer-tag"><i class="fas fa-bolt"></i> Limited Time</div>
+        <h3>${escapeHtml(o.title || 'Special Offer')}${disc > 0 ? ` — ${disc}% OFF` : ''}</h3>
+        ${o.subtitle ? `<p>${escapeHtml(o.subtitle)}</p>` : ''}
+        ${cd}`;
+      const firstShow = bar.dataset.shown !== '1';
+      bar.dataset.shown = '1';
+      bar.classList.remove('hidden');
+      if (firstShow && disc > 0) renderPublicProducts(); // apply discount to cards on first show
+    }
+    function startOfferTimer() {
+      if (offerTimer) { clearInterval(offerTimer); offerTimer = null; }
+      renderOfferBar();
+      if (offerActive()) {
+        offerTimer = setInterval(() => {
+          renderOfferBar();
+          if (!offerActive() && offerTimer) { clearInterval(offerTimer); offerTimer = null; }
+        }, 1000);
+      }
+    }
+
+    /* ===== Category filters ===== */
+    function renderTypeFilters() {
+      const g = document.getElementById('type-filter-group');
+      if (!g) return;
+      const cats = DataStore.getSettings().categories || [];
+      const all = `<button class="filter-btn ${currentFilterType === 'All' ? 'active' : ''}" data-val="All" onclick="setFilter('type', this.dataset.val, this)">All Categories</button>`;
+      const rest = cats.map(c => `<button class="filter-btn ${currentFilterType === c ? 'active' : ''}" data-val="${escapeHtml(c)}" onclick="setFilter('type', this.dataset.val, this)">${escapeHtml(c)}</button>`).join('');
+      g.innerHTML = all + rest;
     }
     function renderPublicProducts() {
       let products = DataStore.getProducts();
@@ -1085,7 +1278,7 @@
           <div class="product-type">${escapeHtml(p.type)} &bull; ${escapeHtml(p.gender || 'Unisex')} &bull; ${escapeHtml(p.family)}</div>
           <h3 class="product-name">${escapeHtml(p.name)}</h3>
           <div class="product-rating">${stars}</div>
-          <div class="product-price">${p.oldPrice ? `<span class="old-price">${fmtEGP(p.oldPrice)}</span>` : ''}${fmtEGP(p.price)}</div>
+          <div class="product-price">${priceHtml(p)}</div>
           <button class="btn-gold btn-outline" style="width:100%" onclick="event.stopPropagation(); addToCart('${p.id}', 1)" ${st === 'out' ? 'disabled' : ''}>
             ${st === 'out' ? 'Unavailable' : '<i class="fas fa-cart-plus" style="margin-right:6px;"></i> Add to Cart'}
           </button>`;
@@ -1093,6 +1286,79 @@
       });
       initScrollAnimations();
     }
+
+    /* ============================== Reviews (public) ============================== */
+    function renderReviewsPublic() {
+      const grid = document.getElementById('reviews-grid');
+      const sum = document.getElementById('reviews-summary');
+      if (!grid || !sum) return;
+      const list = publicReviews();
+      if (list.length) {
+        const avg = list.reduce((s, r) => s + (Number(r.rating) || 0), 0) / list.length;
+        sum.innerHTML = `<div class="rev-avg">${starsHtml(Math.round(avg))}<span>${avg.toFixed(1)} / 5 &middot; ${list.length} review${list.length > 1 ? 's' : ''}</span></div>`;
+        grid.innerHTML = list.map((r, i) => `
+          <div class="testi-card fade-up" style="transition-delay:${(i % 3) * 0.15}s;">
+            <div class="testi-stars">${starsHtml(r.rating)}</div>
+            <p class="testi-text">${escapeHtml(r.text)}</p>
+            <h4 class="testi-name">${escapeHtml(r.name)}</h4>
+          </div>`).join('');
+      } else {
+        sum.innerHTML = '';
+        grid.innerHTML = `<div class="reviews-empty"><i class="fas fa-feather-pointed"></i><p>No reviews yet — be the first to share your experience.</p></div>`;
+      }
+      initScrollAnimations();
+    }
+
+    let selectedReviewRating = 0;
+    let reviewAdminMode = false;
+    function paintReviewStars() {
+      document.querySelectorAll('#rev-stars i').forEach(st => {
+        st.className = Number(st.dataset.v) <= selectedReviewRating ? 'fas fa-star' : 'far fa-star';
+      });
+    }
+    function openReviewModal(adminMode) {
+      reviewAdminMode = !!adminMode;
+      selectedReviewRating = 0;
+      document.getElementById('rev-name').value = '';
+      document.getElementById('rev-text').value = '';
+      document.getElementById('rev-error').style.display = 'none';
+      document.getElementById('review-modal-title').textContent = adminMode ? 'Add Review (from WhatsApp)' : 'Write a Review';
+      document.getElementById('rev-note').textContent = adminMode
+        ? 'Published immediately and marked as a verified WhatsApp review.'
+        : 'Your review is sent for approval before it appears on the site.';
+      paintReviewStars();
+      document.getElementById('review-modal').classList.add('open');
+    }
+    function closeReviewModal() { document.getElementById('review-modal').classList.remove('open'); }
+    function submitReview() {
+      const name = document.getElementById('rev-name').value.trim();
+      const text = document.getElementById('rev-text').value.trim();
+      if (name.length < 2 || selectedReviewRating < 1 || text.length < 3) {
+        document.getElementById('rev-error').style.display = 'block';
+        return;
+      }
+      const reviews = DataStore.getReviews();
+      reviews.unshift({
+        id: Date.now().toString(), name, rating: selectedReviewRating, text,
+        date: new Date().toISOString(), approved: reviewAdminMode,
+        source: reviewAdminMode ? 'whatsapp' : 'site'
+      });
+      DataStore.saveReviews(reviews);
+      closeReviewModal();
+      if (reviewAdminMode) { renderAdminReviews(); renderReviewsPublic(); toast('Review added and published.'); }
+      else { renderReviewsPublic(); toast('Thank you! Your review was submitted for approval.'); }
+    }
+    (function bindStarInput() {
+      const cont = document.getElementById('rev-stars');
+      if (!cont) return;
+      cont.addEventListener('click', e => { const i = e.target.closest('i'); if (!i) return; selectedReviewRating = Number(i.dataset.v); paintReviewStars(); });
+      cont.addEventListener('mouseover', e => {
+        const i = e.target.closest('i'); if (!i) return;
+        const v = Number(i.dataset.v);
+        document.querySelectorAll('#rev-stars i').forEach(st => { st.className = Number(st.dataset.v) <= v ? 'fas fa-star' : 'far fa-star'; });
+      });
+      cont.addEventListener('mouseout', paintReviewStars);
+    })();
 
     /* ============================== Product detail page ============================== */
     function openProductPage(id) {
@@ -1113,7 +1379,7 @@
           <div class="product-page-meta">${escapeHtml(p.type)} &bull; ${escapeHtml(p.gender || 'Unisex')} &bull; ${escapeHtml(p.family)}</div>
           <h1>${escapeHtml(p.name)}</h1>
           <div class="product-rating">${stars}</div>
-          <div class="product-page-price">${p.oldPrice ? `<span class="old-price">${fmtEGP(p.oldPrice)}</span>` : ''}${fmtEGP(p.price)}</div>
+          <div class="product-page-price">${priceHtml(p)}</div>
           <div class="stock-line" style="color:${stockColor};"><i class="fas fa-circle" style="font-size:0.6rem; margin-right:6px;"></i>${stockText}</div>
           <div class="product-page-desc">${escapeHtml(p.description)}</div>
           ${st === 'out' ? `<button class="btn-gold" style="width:100%; max-width:320px;" disabled>Out of Stock</button>` : `
@@ -1183,12 +1449,12 @@
       const products = DataStore.getProducts();
       return DataStore.getCart().map(c => {
         const p = products.find(x => x.id === c.id);
-        return p ? { ...p, qty: c.qty } : null;
+        return p ? { ...p, qty: c.qty, unitPrice: effectivePrice(p), listPrice: Number(p.price) || 0 } : null;
       }).filter(Boolean);
     }
     function cartTotals() {
       const items = cartDetailed();
-      const subtotal = items.reduce((s, i) => s + Number(i.price) * i.qty, 0);
+      const subtotal = items.reduce((s, i) => s + Number(i.unitPrice) * i.qty, 0);
       const set = DataStore.getSettings();
       let delivery = Number(set.deliveryFee || 0);
       const freeOver = Number(set.freeShipOver || 0);
@@ -1217,7 +1483,7 @@
           <div class="cart-item-art">${productArt(i, '')}</div>
           <div class="cart-item-info">
             <h4>${escapeHtml(i.name)}</h4>
-            <div class="ci-price">${fmtEGP(i.price)}</div>
+            <div class="ci-price">${i.unitPrice < i.listPrice ? `<span class="old-price">${fmtEGP(i.listPrice)}</span> ` : ''}${fmtEGP(i.unitPrice)}</div>
             <div class="cart-item-controls">
               <button onclick="changeCartQty('${i.id}', -1)">&minus;</button>
               <span>${i.qty}</span>
@@ -1257,7 +1523,7 @@
       document.getElementById('checkout-step-form').classList.remove('hidden');
       document.getElementById('checkout-step-confirm').classList.add('hidden');
       document.getElementById('checkout-summary').innerHTML = `
-        ${items.map(i => `<div class="row"><span>${escapeHtml(i.name)} × ${i.qty}</span><span>${fmtEGP(i.price * i.qty)}</span></div>`).join('')}
+        ${items.map(i => `<div class="row"><span>${escapeHtml(i.name)} × ${i.qty}</span><span>${fmtEGP(i.unitPrice * i.qty)}</span></div>`).join('')}
         <div class="row"><span>Delivery</span><span>${delivery === 0 ? 'Free' : fmtEGP(delivery)}</span></div>
         <div class="row total"><span>Total</span><span>${fmtEGP(total)}</span></div>`;
       closeCart();
@@ -1306,7 +1572,7 @@
       };
       const order = {
         id: Date.now().toString(), number, date: new Date().toISOString(),
-        customer, items: items.map(i => ({ id: i.id, name: i.name, price: Number(i.price), qty: i.qty })),
+        customer, items: items.map(i => ({ id: i.id, name: i.name, price: Number(i.unitPrice), qty: i.qty })),
         subtotal, delivery, total, status: 'Pending'
       };
       orders.unshift(order);
@@ -1376,7 +1642,7 @@
       if (sessionStorage.getItem('altinos_admin') === 'true') {
         document.getElementById('admin-login').classList.add('hidden');
         document.getElementById('admin-dashboard').classList.remove('hidden');
-        renderDashboard(); renderAdminProducts(); renderAdminOrders(); loadAdminSettings();
+        renderDashboard(); renderAdminProducts(); renderAdminOrders(); renderAdminReviews(); loadAdminSettings();
       } else {
         document.getElementById('admin-login').classList.remove('hidden');
         document.getElementById('admin-dashboard').classList.add('hidden');
@@ -1406,6 +1672,7 @@
       if (tab === 'dashboard') renderDashboard();
       if (tab === 'orders') renderAdminOrders();
       if (tab === 'products') renderAdminProducts();
+      if (tab === 'reviews') renderAdminReviews();
     }
 
     /* ============================== Admin: Dashboard ============================== */
@@ -1473,6 +1740,7 @@
         document.getElementById('modal-title').textContent = 'Edit Product';
         const p = DataStore.getProducts().find(x => x.id === id);
         if (p) {
+          renderTypeOptions(p.type);
           document.getElementById('prod-id').value = p.id;
           document.getElementById('prod-name').value = p.name;
           document.getElementById('prod-price').value = p.price;
@@ -1486,10 +1754,18 @@
           if (p.image) { document.getElementById('prod-img-data').value = p.image; document.getElementById('prod-preview').innerHTML = `<img src="${escapeHtml(p.image)}">`; }
         }
       } else {
+        renderTypeOptions();
         document.getElementById('modal-title').textContent = 'Add Product';
         document.getElementById('prod-id').value = '';
         document.getElementById('prod-qty').value = 10;
       }
+    }
+    function renderTypeOptions(selected) {
+      const sel = document.getElementById('prod-type');
+      if (!sel) return;
+      const cats = (DataStore.getSettings().categories || []).slice();
+      if (selected && !cats.includes(selected)) cats.unshift(selected); // preserve a legacy/removed type
+      sel.innerHTML = cats.map(c => `<option value="${escapeHtml(c)}" ${c === selected ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('');
     }
     function editProduct(id) { openProductModal(id); }
     function closeProductModal() { document.getElementById('product-modal').classList.remove('open'); }
@@ -1595,6 +1871,89 @@
       }
     }
 
+    /* ============================== Admin: Reviews ============================== */
+    function renderAdminReviews() {
+      const tb = document.getElementById('admin-reviews-tbody');
+      if (!tb) return;
+      const reviews = DataStore.getReviews();
+      if (!reviews.length) {
+        tb.innerHTML = `<tr><td colspan="7" class="empty-state"><i class="fas fa-comments"></i>No reviews on this browser yet. Add one from WhatsApp, or wait for visitors to submit.</td></tr>`;
+        return;
+      }
+      tb.innerHTML = reviews.map(r => `<tr>
+        <td><strong>${escapeHtml(r.name)}</strong></td>
+        <td style="color:var(--gold-primary); white-space:nowrap;">${starsHtml(r.rating)}</td>
+        <td style="max-width:280px; color:#ccc;">${escapeHtml(r.text)}</td>
+        <td>${r.source === 'whatsapp' ? '<span class="pill green">WhatsApp</span>' : '<span class="pill amber">Site</span>'}</td>
+        <td>${r.approved ? '<span class="pill green">Approved</span>' : '<span class="pill amber">Pending</span>'}</td>
+        <td>${new Date(r.date).toLocaleDateString()}</td>
+        <td class="action-btns">
+          <button onclick="toggleReview('${r.id}')" title="${r.approved ? 'Hide' : 'Approve'}"><i class="fas ${r.approved ? 'fa-eye-slash' : 'fa-check'}"></i></button>
+          <button class="btn-del" onclick="deleteReview('${r.id}')" title="Delete"><i class="fas fa-trash"></i></button>
+        </td></tr>`).join('');
+    }
+    function toggleReview(id) {
+      const rv = DataStore.getReviews();
+      const r = rv.find(x => x.id === id); if (!r) return;
+      r.approved = !r.approved;
+      DataStore.saveReviews(rv);
+      renderAdminReviews(); renderReviewsPublic();
+      toast(r.approved ? 'Review published.' : 'Review hidden.');
+    }
+    function deleteReview(id) {
+      if (confirm('Delete this review permanently?')) {
+        DataStore.saveReviews(DataStore.getReviews().filter(r => r.id !== id));
+        renderAdminReviews(); renderReviewsPublic();
+        toast('Review deleted.');
+      }
+    }
+    function exportReviews() {
+      const list = publicReviews().map(r => ({
+        id: r.id || Date.now().toString(), name: r.name, rating: Number(r.rating) || 5,
+        text: r.text, date: r.date || new Date().toISOString(), approved: true, source: r.source || 'whatsapp'
+      }));
+      const code = 'const DEFAULT_REVIEWS = ' + JSON.stringify(list, null, 2) + ';';
+      let copied = false;
+      try { if (navigator.clipboard) { navigator.clipboard.writeText(code); copied = true; } } catch (e) {}
+      toast(copied ? 'Copied! Paste it over the DEFAULT_REVIEWS line in the file.' : 'Copy the text shown, then paste it into the file.');
+      window.prompt('Replace the DEFAULT_REVIEWS line in index.html with this, then re-publish so every visitor sees these reviews:', code);
+    }
+
+    /* ============================== Admin: Categories ============================== */
+    function renderCategorySettings() {
+      const wrap = document.getElementById('cat-list');
+      if (!wrap) return;
+      const cats = DataStore.getSettings().categories || [];
+      wrap.innerHTML = cats.length
+        ? cats.map(c => `<span class="cat-chip">${escapeHtml(c)} <i class="fas fa-times" data-c="${escapeHtml(c)}" onclick="removeCategory(this.dataset.c)" title="Remove"></i></span>`).join('')
+        : `<span style="color:#888; font-size:0.85rem;">No categories yet — add one below.</span>`;
+    }
+    function addCategory() {
+      const inp = document.getElementById('new-cat');
+      const name = (inp.value || '').trim();
+      if (!name) return;
+      const s = DataStore.getSettings();
+      const cats = s.categories || [];
+      if (cats.some(c => c.toLowerCase() === name.toLowerCase())) { toast('That category already exists.', 'error'); return; }
+      cats.push(name);
+      s.categories = cats;
+      DataStore.saveSettings(s);
+      inp.value = '';
+      renderCategorySettings(); renderTypeFilters();
+      toast('Category added.');
+    }
+    function removeCategory(name) {
+      const s = DataStore.getSettings();
+      const inUse = DataStore.getProducts().filter(p => p.type === name).length;
+      const msg = inUse ? `Remove "${name}"? ${inUse} product(s) use it — they keep this type but it won't show as a filter button.` : `Remove "${name}"?`;
+      if (!confirm(msg)) return;
+      s.categories = (s.categories || []).filter(c => c !== name);
+      DataStore.saveSettings(s);
+      if (currentFilterType === name) currentFilterType = 'All';
+      renderCategorySettings(); renderTypeFilters();
+      toast('Category removed.');
+    }
+
     /* ============================== Admin: Settings ============================== */
     function loadAdminSettings() {
       const s = DataStore.getSettings();
@@ -1608,6 +1967,13 @@
       document.getElementById('set-fb').value = s.facebook;
       document.getElementById('set-wa').value = s.whatsapp || '';
       document.getElementById('set-pwd').value = s.adminPassword || '';
+      const o = s.offer || {};
+      document.getElementById('set-offer-enabled').checked = !!o.enabled;
+      document.getElementById('set-offer-title').value = o.title || '';
+      document.getElementById('set-offer-subtitle').value = o.subtitle || '';
+      document.getElementById('set-offer-end').value = o.endsAt || '';
+      document.getElementById('set-offer-discount').value = o.discountPercent || 0;
+      renderCategorySettings();
     }
     function saveSettings() {
       const s = DataStore.getSettings();
@@ -1621,7 +1987,14 @@
         tiktok: document.getElementById('set-tiktok').value,
         facebook: document.getElementById('set-fb').value,
         whatsapp: document.getElementById('set-wa').value,
-        adminPassword: document.getElementById('set-pwd').value || 'altinos2025'
+        adminPassword: document.getElementById('set-pwd').value || 'altinos2025',
+        offer: {
+          enabled: document.getElementById('set-offer-enabled').checked,
+          title: document.getElementById('set-offer-title').value.trim(),
+          subtitle: document.getElementById('set-offer-subtitle').value.trim(),
+          endsAt: document.getElementById('set-offer-end').value,
+          discountPercent: Math.max(0, Math.min(90, Number(document.getElementById('set-offer-discount').value) || 0))
+        }
       }));
       renderAdminProducts(); renderDashboard();
       toast('Settings saved successfully.');
@@ -1631,4 +2004,89 @@
     updateCartUI();
   </script>
 </body>
+<!-- ================= FIREBASE CLOUD SYNC ================= -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc, onSnapshot, initializeFirestore, persistentLocalCache } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA1FtGZcnQEk9MYAWEYMBkYQs9v0waBia4",
+      authDomain: "altions-5f6b8.firebaseapp.com",
+      projectId: "altions-5f6b8",
+      storageBucket: "altions-5f6b8.firebasestorage.app",
+      messagingSenderId: "788148409169",
+      appId: "1:788148409169:web:d5af8252f22b63c45bf970"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    
+    // Offline-safe database initialization
+    const db = initializeFirestore(app, {
+      localCache: persistentLocalCache()
+    });
+
+    // Run this in the background so it NEVER blocks the page load
+    setTimeout(async () => {
+      try {
+        const collections = ["products", "settings", "orders", "reviews"];
+        for (const col of collections) {
+          const snap = await getDoc(doc(db, "altinos", col));
+          if (!snap.exists()) {
+            const localData = DataStore['get' + col.charAt(0).toUpperCase() + col.slice(1)]();
+            await setDoc(doc(db, "altinos", col), { data: localData });
+          }
+        }
+      } catch (e) {
+        console.log("Firebase connection bypassed due to network restrictions.");
+      }
+    }, 1000);
+
+    // Intercept saves
+    const originalSaveProducts = DataStore.saveProducts;
+    DataStore.saveProducts = function(p) { originalSaveProducts(p); setDoc(doc(db, "altinos", "products"), { data: p }).catch(e => console.log("Saved locally only")); };
+
+    const originalSaveSettings = DataStore.saveSettings;
+    DataStore.saveSettings = function(s) { originalSaveSettings(s); setDoc(doc(db, "altinos", "settings"), { data: s }).catch(e => console.log("Saved locally only")); };
+
+    const originalSaveOrders = DataStore.saveOrders;
+    DataStore.saveOrders = function(o) { originalSaveOrders(o); setDoc(doc(db, "altinos", "orders"), { data: o }).catch(e => console.log("Saved locally only")); };
+
+    const originalSaveReviews = DataStore.saveReviews;
+    DataStore.saveReviews = function(r) { originalSaveReviews(r); setDoc(doc(db, "altinos", "reviews"), { data: r }).catch(e => console.log("Saved locally only")); };
+
+    // Real-time listeners (wrapped to prevent page crashes if blocked)
+    onSnapshot(doc(db, "altinos", "products"), (docSnap) => {
+      if (docSnap.exists() && docSnap.data().data) {
+        localStorage.setItem('altinos_products', JSON.stringify(docSnap.data().data));
+        if (typeof renderPublicProducts === 'function') renderPublicProducts();
+        if (window.location.hash === '#admin' && typeof renderAdminProducts === 'function') renderAdminProducts();
+      }
+    }, e => console.log("Sync paused"));
+
+    onSnapshot(doc(db, "altinos", "settings"), (docSnap) => {
+      if (docSnap.exists() && docSnap.data().data) {
+        localStorage.setItem('altinos_settings', JSON.stringify(docSnap.data().data));
+        if (typeof renderPublicSite === 'function') renderPublicSite();
+        if (window.location.hash === '#admin' && typeof loadAdminSettings === 'function') loadAdminSettings();
+      }
+    }, e => console.log("Sync paused"));
+
+    onSnapshot(doc(db, "altinos", "orders"), (docSnap) => {
+      if (docSnap.exists() && docSnap.data().data) {
+        localStorage.setItem('altinos_orders', JSON.stringify(docSnap.data().data));
+        if (window.location.hash === '#admin') {
+          if (typeof renderAdminOrders === 'function') renderAdminOrders();
+          if (typeof renderDashboard === 'function') renderDashboard();
+        }
+      }
+    }, e => console.log("Sync paused"));
+
+    onSnapshot(doc(db, "altinos", "reviews"), (docSnap) => {
+      if (docSnap.exists() && docSnap.data().data) {
+        localStorage.setItem('altinos_reviews', JSON.stringify(docSnap.data().data));
+        if (typeof renderReviewsPublic === 'function') renderReviewsPublic();
+        if (window.location.hash === '#admin' && typeof renderAdminReviews === 'function') renderAdminReviews();
+      }
+    }, e => console.log("Sync paused"));
+  </script>  </script>
 </html>
