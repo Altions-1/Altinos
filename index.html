@@ -2005,88 +2005,115 @@
   </script>
 </body>
 <!-- ================= FIREBASE CLOUD SYNC ================= -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, onSnapshot, initializeFirestore, persistentLocalCache } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+  import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyA1FtGZcnQEk9MYAWEYMBkYQs9v0waBia4",
-      authDomain: "altions-5f6b8.firebaseapp.com",
-      projectId: "altions-5f6b8",
-      storageBucket: "altions-5f6b8.firebasestorage.app",
-      messagingSenderId: "788148409169",
-      appId: "1:788148409169:web:d5af8252f22b63c45bf970"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyA1FtGZcnQEk9MYAWEYMBkYQs9v0waBia4",
+    authDomain: "altions-5f6b8.firebaseapp.com",
+    projectId: "altions-5f6b8",
+    storageBucket: "altions-5f6b8.firebasestorage.app",
+    messagingSenderId: "788148409169",
+    appId: "1:788148409169:web:d5af8252f22b63c45bf970"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    
-    // Offline-safe database initialization
-    const db = initializeFirestore(app, {
-      localCache: persistentLocalCache()
-    });
+  const app = initializeApp(firebaseConfig);
+  
+  // We removed the "offline cache" setting here to FORCE a live cloud connection
+  const db = getFirestore(app);
 
-    // Run this in the background so it NEVER blocks the page load
-    setTimeout(async () => {
-      try {
-        const collections = ["products", "settings", "orders", "reviews"];
-        for (const col of collections) {
-          const snap = await getDoc(doc(db, "altinos", col));
-          if (!snap.exists()) {
-            const localData = DataStore['get' + col.charAt(0).toUpperCase() + col.slice(1)]();
-            await setDoc(doc(db, "altinos", col), { data: localData });
-          }
-        }
-      } catch (e) {
-        console.log("Firebase connection bypassed due to network restrictions.");
-      }
-    }, 1000);
-
-    // Intercept saves
-    const originalSaveProducts = DataStore.saveProducts;
-    DataStore.saveProducts = function(p) { originalSaveProducts(p); setDoc(doc(db, "altinos", "products"), { data: p }).catch(e => console.log("Saved locally only")); };
-
-    const originalSaveSettings = DataStore.saveSettings;
-    DataStore.saveSettings = function(s) { originalSaveSettings(s); setDoc(doc(db, "altinos", "settings"), { data: s }).catch(e => console.log("Saved locally only")); };
-
-    const originalSaveOrders = DataStore.saveOrders;
-    DataStore.saveOrders = function(o) { originalSaveOrders(o); setDoc(doc(db, "altinos", "orders"), { data: o }).catch(e => console.log("Saved locally only")); };
-
-    const originalSaveReviews = DataStore.saveReviews;
-    DataStore.saveReviews = function(r) { originalSaveReviews(r); setDoc(doc(db, "altinos", "reviews"), { data: r }).catch(e => console.log("Saved locally only")); };
-
-    // Real-time listeners (wrapped to prevent page crashes if blocked)
-    onSnapshot(doc(db, "altinos", "products"), (docSnap) => {
-      if (docSnap.exists() && docSnap.data().data) {
-        localStorage.setItem('altinos_products', JSON.stringify(docSnap.data().data));
-        if (typeof renderPublicProducts === 'function') renderPublicProducts();
-        if (window.location.hash === '#admin' && typeof renderAdminProducts === 'function') renderAdminProducts();
-      }
-    }, e => console.log("Sync paused"));
-
-    onSnapshot(doc(db, "altinos", "settings"), (docSnap) => {
-      if (docSnap.exists() && docSnap.data().data) {
-        localStorage.setItem('altinos_settings', JSON.stringify(docSnap.data().data));
-        if (typeof renderPublicSite === 'function') renderPublicSite();
-        if (window.location.hash === '#admin' && typeof loadAdminSettings === 'function') loadAdminSettings();
-      }
-    }, e => console.log("Sync paused"));
-
-    onSnapshot(doc(db, "altinos", "orders"), (docSnap) => {
-      if (docSnap.exists() && docSnap.data().data) {
-        localStorage.setItem('altinos_orders', JSON.stringify(docSnap.data().data));
-        if (window.location.hash === '#admin') {
-          if (typeof renderAdminOrders === 'function') renderAdminOrders();
-          if (typeof renderDashboard === 'function') renderDashboard();
+  // 1. Force Initialize Cloud Data if Empty
+  setTimeout(async () => {
+    try {
+      const collections = ["products", "settings", "orders", "reviews"];
+      for (const col of collections) {
+        const snap = await getDoc(doc(db, "altinos", col));
+        if (!snap.exists()) {
+          const localData = DataStore['get' + col.charAt(0).toUpperCase() + col.slice(1)]();
+          await setDoc(doc(db, "altinos", col), { data: localData });
         }
       }
-    }, e => console.log("Sync paused"));
+    } catch (e) {
+      console.error("CRITICAL: Could not connect to Firebase on startup.", e);
+    }
+  }, 1000);
 
-    onSnapshot(doc(db, "altinos", "reviews"), (docSnap) => {
-      if (docSnap.exists() && docSnap.data().data) {
-        localStorage.setItem('altinos_reviews', JSON.stringify(docSnap.data().data));
-        if (typeof renderReviewsPublic === 'function') renderReviewsPublic();
-        if (window.location.hash === '#admin' && typeof renderAdminReviews === 'function') renderAdminReviews();
+  // 2. Intercept saves to FORCE Firebase. 
+  // It will ONLY update the local screen IF the Firebase save is 100% successful.
+  DataStore.saveProducts = async function(p) { 
+    try {
+      await setDoc(doc(db, "altinos", "products"), { data: p });
+      localStorage.setItem('altinos_products', JSON.stringify(p)); 
+    } catch(e) {
+      alert("Firebase Error: Could not save product to the cloud. Check your Firebase Rules.");
+      console.error(e);
+    }
+  };
+
+  DataStore.saveSettings = async function(s) { 
+    try {
+      await setDoc(doc(db, "altinos", "settings"), { data: s });
+      localStorage.setItem('altinos_settings', JSON.stringify(s));
+    } catch(e) {
+      alert("Firebase Error: Could not save settings to the cloud. Check your Firebase Rules.");
+      console.error(e);
+    }
+  };
+
+  DataStore.saveOrders = async function(o) { 
+    try {
+      await setDoc(doc(db, "altinos", "orders"), { data: o });
+      localStorage.setItem('altinos_orders', JSON.stringify(o));
+    } catch(e) {
+      alert("Firebase Error: Could not save order to the cloud.");
+      console.error(e);
+    }
+  };
+
+  DataStore.saveReviews = async function(r) { 
+    try {
+      await setDoc(doc(db, "altinos", "reviews"), { data: r });
+      localStorage.setItem('altinos_reviews', JSON.stringify(r));
+    } catch(e) {
+      alert("Firebase Error: Could not save review to the cloud.");
+      console.error(e);
+    }
+  };
+
+  // 3. Real-time listeners. If Firebase blocks the connection, it throws a visible error.
+  onSnapshot(doc(db, "altinos", "products"), (docSnap) => {
+    if (docSnap.exists() && docSnap.data().data) {
+      localStorage.setItem('altinos_products', JSON.stringify(docSnap.data().data));
+      if (typeof renderPublicProducts === 'function') renderPublicProducts();
+      if (window.location.hash === '#admin' && typeof renderAdminProducts === 'function') renderAdminProducts();
+    }
+  }, e => { console.error("Firebase Sync Blocked (Products)", e); });
+
+  onSnapshot(doc(db, "altinos", "settings"), (docSnap) => {
+    if (docSnap.exists() && docSnap.data().data) {
+      localStorage.setItem('altinos_settings', JSON.stringify(docSnap.data().data));
+      if (typeof renderPublicSite === 'function') renderPublicSite();
+      if (window.location.hash === '#admin' && typeof loadAdminSettings === 'function') loadAdminSettings();
+    }
+  }, e => { console.error("Firebase Sync Blocked (Settings)", e); });
+
+  onSnapshot(doc(db, "altinos", "orders"), (docSnap) => {
+    if (docSnap.exists() && docSnap.data().data) {
+      localStorage.setItem('altinos_orders', JSON.stringify(docSnap.data().data));
+      if (window.location.hash === '#admin') {
+        if (typeof renderAdminOrders === 'function') renderAdminOrders();
+        if (typeof renderDashboard === 'function') renderDashboard();
       }
-    }, e => console.log("Sync paused"));
-  </script>  </script>
+    }
+  }, e => { console.error("Firebase Sync Blocked (Orders)", e); });
+
+  onSnapshot(doc(db, "altinos", "reviews"), (docSnap) => {
+    if (docSnap.exists() && docSnap.data().data) {
+      localStorage.setItem('altinos_reviews', JSON.stringify(docSnap.data().data));
+      if (typeof renderReviewsPublic === 'function') renderReviewsPublic();
+      if (window.location.hash === '#admin' && typeof renderAdminReviews === 'function') renderAdminReviews();
+    }
+  }, e => { console.error("Firebase Sync Blocked (Reviews)", e); });
+</script>
 </html>
